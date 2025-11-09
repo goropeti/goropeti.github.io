@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Tűzszalamandra Populáció Sűrűség Vizualizáció" />
+    <title>Tűzszalamandra Populáció Sűrűség - Európa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <a class="logo" href="#">Salamandra Vizualizátor</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1>Tűzszalamandra Populáció Sűrűség</h1>
+          <p>Fedezze fel a <em>Salamandra salamandra</em> populáció sűrűségét Európában az elmúlt 20 évben az iNaturalist megfigyelési adatok alapján.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="controls">
+            <label for="yearSelect">Válasszon évet:</label>
+            <select id="yearSelect" class="year-select">
+              <option value="">Évek betöltése...</option>
+            </select>
+            <div id="loadingIndicator" class="loading" style="display: none;">Adatok betöltése...</div>
+          </div>
+          <div id="chart" class="map-container"></div>
+          <div id="info" class="info-text"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <small>© <span id="year"></span> Tűzszalamandra Vizualizáció | Adatok az <a href="https://www.inaturalist.org" target="_blank">iNaturalist</a>-től</small>
+      </div>
+    </footer>
+
+    <!-- Vega, Vega-Lite, and Vega-Embed (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    <script src="script.js"></script>
+  </body>
+  </html>
+
+
