@@ -259,6 +259,36 @@ html, body {
   font-size: 14px;
 }
 
+/* Section title styling */
+.section-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 24px;
+  text-align: center;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+/* Chart container styling */
+.chart-container {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.chart-container .vega-embed,
+.chart-container canvas,
+.chart-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Footer link styling */
 .site-footer a {
   color: var(--accent-green-light);
