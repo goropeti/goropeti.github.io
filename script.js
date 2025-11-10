@@ -228,6 +228,41 @@ async function fetchObservations(year, showLoading = true) {
   }
 }
 
+// Fast count-only fetch for a given year.
+// Uses a single API request (per_page=1) and reads `total_results` returned by iNaturalist.
+// This is much faster and avoids paging when we only need the total count (e.g., for the year column chart).
+async function fetchObservationCount(year) {
+  try {
+    const taxonId = await getTaxonId();
+    const startDate = `${year}-01-01`;
+    const endDate = `${year}-12-31`;
+
+    const url = new URL('https://api.inaturalist.org/v1/observations');
+    url.searchParams.append('taxon_id', taxonId);
+    url.searchParams.append('nelat', EUROPE_BOUNDS.nelat.toString());
+    url.searchParams.append('nelng', EUROPE_BOUNDS.nelng.toString());
+    url.searchParams.append('swlat', EUROPE_BOUNDS.swlat.toString());
+    url.searchParams.append('swlng', EUROPE_BOUNDS.swlng.toString());
+    url.searchParams.append('d1', startDate);
+    url.searchParams.append('d2', endDate);
+    // Only request 1 result, we only need the total_results field
+    url.searchParams.append('per_page', '1');
+    url.searchParams.append('page', '1');
+    url.searchParams.append('geo', 'true');
+    url.searchParams.append('quality_grade', 'research,needs_id,casual');
+
+    const response = await fetch(url);
+    if (!response.ok) return 0;
+
+    const data = await response.json();
+    // data.total_results should contain the full count across all pages
+    return Number.isFinite(data.total_results) ? data.total_results : 0;
+  } catch (err) {
+    console.warn('Could not fetch observation count for', year, err);
+    return 0;
+  }
+}
+
 // Process observations into density grid with smoothing
 function createDensityGrid(observations, gridSize = 30) {
   // Create a finer grid for better heatmap visualization
@@ -589,14 +624,21 @@ async function fetchAllYearsData() {
         if (infoEl) {
           infoEl.textContent = `Adatok betöltése: ${processedYears}/${totalYears} év (${year})...`;
         }
-        
+        // Use a fast count-only request to get the accurate total number of observations for the year
+        // This avoids the previous implicit limit of 5 pages (1000 observations) when only the yearly
+        // count is required for the column chart.
+        const totalForYear = await fetchObservationCount(year);
+        yearData[year] = totalForYear;
+
+        // For country aggregation we still need the actual observations. Keep existing behavior
+        // (may be paged/truncated by fetchObservations) to avoid heavy refactors here.
+        // This preserves previous country-aggregation behavior while fixing the yearly totals.
         const observations = await fetchObservations(year, false); // Don't show loading indicator
-        yearData[year] = observations.length;
-        
+
         // Process country data
         for (const obs of observations) {
           let country = obs._country;
-          
+
           if (country && country.trim() !== '') {
             // Normalize country names (remove extra spaces, etc.)
             country = country.trim();
